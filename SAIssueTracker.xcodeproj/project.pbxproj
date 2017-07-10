@@ -7,12 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C18FB3561F139F84007680AE /* CHelperMethods.c in Sources */ = {isa = PBXBuildFile; fileRef = C18FB3541F139F84007680AE /* CHelperMethods.c */; };
 		C1C476CF1F1117040005A412 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C476CE1F1117040005A412 /* AppDelegate.swift */; };
 		C1C476D11F1117040005A412 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C476D01F1117040005A412 /* ViewController.swift */; };
 		C1C476D41F1117040005A412 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C1C476D21F1117040005A412 /* Main.storyboard */; };
 		C1C476D61F1117040005A412 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C1C476D51F1117040005A412 /* Assets.xcassets */; };
 		C1C476D91F1117040005A412 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C1C476D71F1117040005A412 /* LaunchScreen.storyboard */; };
 		C1C476E41F1117050005A412 /* SAIssueTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C476E31F1117050005A412 /* SAIssueTrackerTests.swift */; };
+		C1C476F01F111DBC0005A412 /* SAIssueTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C476EF1F111DBC0005A412 /* SAIssueTracker.swift */; };
+		C1C476F11F111DBC0005A412 /* SAIssueTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C476EF1F111DBC0005A412 /* SAIssueTracker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -26,6 +29,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C18FB3531F139F83007680AE /* SAIssueTracker-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SAIssueTracker-Bridging-Header.h"; sourceTree = "<group>"; };
+		C18FB3541F139F84007680AE /* CHelperMethods.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CHelperMethods.c; sourceTree = "<group>"; };
 		C1C476CB1F1117040005A412 /* SAIssueTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SAIssueTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1C476CE1F1117040005A412 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C1C476D01F1117040005A412 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -36,6 +41,7 @@
 		C1C476DF1F1117050005A412 /* SAIssueTrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SAIssueTrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1C476E31F1117050005A412 /* SAIssueTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SAIssueTrackerTests.swift; sourceTree = "<group>"; };
 		C1C476E51F1117050005A412 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C1C476EF1F111DBC0005A412 /* SAIssueTracker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAIssueTracker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +65,7 @@
 		C1C476C21F1117040005A412 = {
 			isa = PBXGroup;
 			children = (
+				C1C476EE1F1118200005A412 /* Classes */,
 				C1C476CD1F1117040005A412 /* SAIssueTracker */,
 				C1C476E21F1117050005A412 /* SAIssueTrackerTests */,
 				C1C476CC1F1117040005A412 /* Products */,
@@ -94,6 +101,16 @@
 				C1C476E51F1117050005A412 /* Info.plist */,
 			);
 			path = SAIssueTrackerTests;
+			sourceTree = "<group>";
+		};
+		C1C476EE1F1118200005A412 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				C1C476EF1F111DBC0005A412 /* SAIssueTracker.swift */,
+				C18FB3541F139F84007680AE /* CHelperMethods.c */,
+				C18FB3531F139F83007680AE /* SAIssueTracker-Bridging-Header.h */,
+			);
+			path = Classes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -146,7 +163,8 @@
 				TargetAttributes = {
 					C1C476CA1F1117040005A412 = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = L4XJFYDD5W;
+						DevelopmentTeam = 2E3PK56V7J;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
 					C1C476DE1F1117050005A412 = {
@@ -201,6 +219,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C18FB3561F139F84007680AE /* CHelperMethods.c in Sources */,
+				C1C476F01F111DBC0005A412 /* SAIssueTracker.swift in Sources */,
 				C1C476D11F1117040005A412 /* ViewController.swift in Sources */,
 				C1C476CF1F1117040005A412 /* AppDelegate.swift in Sources */,
 			);
@@ -210,6 +230,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1C476F11F111DBC0005A412 /* SAIssueTracker.swift in Sources */,
 				C1C476E41F1117050005A412 /* SAIssueTrackerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -341,11 +362,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = L4XJFYDD5W;
+				CLANG_ENABLE_MODULES = YES;
+				DEVELOPMENT_TEAM = 2E3PK56V7J;
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = SAIssueTracker/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = SandeepAggarwal.SAIssueTracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Classes/SAIssueTracker-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -354,11 +381,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = L4XJFYDD5W;
+				CLANG_ENABLE_MODULES = YES;
+				DEVELOPMENT_TEAM = 2E3PK56V7J;
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = SAIssueTracker/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = SandeepAggarwal.SAIssueTracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Classes/SAIssueTracker-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
@@ -412,6 +444,7 @@
 				C1C476EA1F1117050005A412 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C1C476EB1F1117050005A412 /* Build configuration list for PBXNativeTarget "SAIssueTrackerTests" */ = {
 			isa = XCConfigurationList;
@@ -420,6 +453,7 @@
 				C1C476ED1F1117050005A412 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
