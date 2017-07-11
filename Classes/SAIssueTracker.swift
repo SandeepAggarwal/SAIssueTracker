@@ -42,21 +42,30 @@ class SAIssueTracker : IssueTracker
         self.consoleLogs = consoleLogs
         self.exceptionLogs = exceptionLogs
         
+        consoleLogsFilePath = customConsoleLogsFilePath()
+        exceptionLogsFilePath = customExceptionLogsFilePath()
+        
+        self.issueSender.consoleLogsFilePath = consoleLogsFilePath
+        self.issueSender.exceptionLogsFilePath = exceptionLogsFilePath
+        
         if amIAttachedToDebugger()
         {
             //so as to continue to log on developer's Xcode console
            return
         }
         
+        if needToSendLogFiles()
+        {
+            send()
+        }
+        
         if optedForConsoleLogs
         {
-            consoleLogsFilePath = saveConsoleLogsInFile()
-            self.issueSender.consoleLogsFilePath = consoleLogsFilePath
+            saveConsoleLogsInFile(path: consoleLogsFilePath!)
         }
         if optedForExceptionLogs
         {
-            exceptionLogsFilePath = saveExceptionLogsInFile()
-            self.issueSender.exceptionLogsFilePath = exceptionLogsFilePath
+            saveExceptionLogsInFile(path: exceptionLogsFilePath!)
             configureUnCaughtExceptionLogs()
         }
         closeLogFilesOnAppTermination()
@@ -88,20 +97,16 @@ private extension SAIssueTracker
         static let exceptionsLogFileName = "exceptions.log"
     }
     
-    func saveConsoleLogsInFile() -> String
+    func saveConsoleLogsInFile(path: String)
     {
-        let pathForLog = documentDirectoryPathAppending(path: SAIssueTracker.consoleLogFileName)
-        _consoleLogFilePointer = freopen(pathForLog.cString(using: String.Encoding.ascii)!, "w", stdout)
+        _consoleLogFilePointer = freopen(path.cString(using: String.Encoding.ascii)!, "w", stdout)
         setvbuf(_consoleLogFilePointer, nil, _IONBF, 0)
-        return pathForLog
     }
     
-    func saveExceptionLogsInFile() -> String
+    func saveExceptionLogsInFile(path: String)
     {
-        let pathForLog = documentDirectoryPathAppending(path: SAIssueTracker.exceptionsLogFileName)
-        _exceptionsLogFilePointer = freopen(pathForLog.cString(using: String.Encoding.ascii)!, "w", stderr)
+        _exceptionsLogFilePointer = freopen(path.cString(using: String.Encoding.ascii)!, "w", stderr)
          setvbuf(_exceptionsLogFilePointer, nil, _IONBF, 0)
-        return pathForLog
     }
     
     func configureUnCaughtExceptionLogs()
@@ -136,6 +141,43 @@ private extension SAIssueTracker
         {
             fclose(_exceptionsLogFilePointer)
         }
+    }
+    
+    func needToSendLogFiles() -> Bool
+    {
+        return !checkIfExceptionFileIsEmpty()
+    }
+    
+    func checkIfExceptionFileIsEmpty() -> Bool
+    {
+        let manager = FileManager.default
+        let path = customExceptionLogsFilePath()
+        guard manager.fileExists(atPath: path) else
+        {
+            return true //empty
+        }
+        
+        do
+        {
+           let attributes = try manager.attributesOfItem(atPath: path)
+           let size: UInt64 = attributes[FileAttributeKey.size] as! UInt64
+            
+           return (size == 0) //empty
+        }
+        catch
+        {
+            return true //empty
+        }
+    }
+    
+    func customConsoleLogsFilePath() -> String
+    {
+        return documentDirectoryPathAppending(path: SAIssueTracker.consoleLogFileName)
+    }
+    
+    func customExceptionLogsFilePath() -> String
+    {
+        return documentDirectoryPathAppending(path: SAIssueTracker.exceptionsLogFileName)
     }
     
     func documentDirectoryPathAppending(path: String) -> String
