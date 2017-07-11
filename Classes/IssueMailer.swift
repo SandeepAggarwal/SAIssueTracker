@@ -62,8 +62,15 @@ extension IssueMailer: IssueSender
         let attachment1 = MCOAttachment(contentsOfFile: consoleLogsFilePath)
         let attachment2 = MCOAttachment(contentsOfFile: exceptionLogsFilePath)
         
-        builder.addAttachment(attachment1)
-        builder.addAttachment(attachment2)
+        if (attachment1?.data != nil)
+        {
+           builder.addAttachment(attachment1)
+        }
+        
+        if (attachment2?.data != nil)
+        {
+           builder.addAttachment(attachment2)
+        }
         
         let rfc822Data = builder.data()
         let sendOperation = smtpSession.sendOperation(with: rfc822Data!)
