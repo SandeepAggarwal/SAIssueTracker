@@ -79,12 +79,10 @@ extension IssueMailer: IssueSender
             if (error != nil)
             {
                 completion(false, error)
-                NSLog("Error sending email: \(String(describing: error))")
             }
             else
             {
                 completion(true, nil)
-                NSLog("Successfully sent email!")
             }
         }
     }
