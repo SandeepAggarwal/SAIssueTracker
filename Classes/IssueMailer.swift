@@ -29,7 +29,7 @@ class IssueMailer
 
 extension IssueMailer: IssueSender
 {
-    func sendLogs()
+    func sendLogs(completion: @escaping (Bool, Error?) -> Void)
     {
         guard (isValid(email: senderEmail) && isValid(email: toEmail)) else
         {
@@ -78,10 +78,12 @@ extension IssueMailer: IssueSender
         { (error) -> Void in
             if (error != nil)
             {
+                completion(false, error)
                 NSLog("Error sending email: \(String(describing: error))")
             }
             else
             {
+                completion(true, nil)
                 NSLog("Successfully sent email!")
             }
         }

@@ -8,10 +8,10 @@
 
 import Foundation
 
-@objc protocol IssueSender
+protocol IssueSender
 {
     var consoleLogsFilePath: String? {get set}
     var exceptionLogsFilePath: String? {get set}
     
-   @objc optional func sendLogs()
+    func sendLogs(completion: @escaping( _ completion: Bool, _ error: Error?) -> Void)
 }

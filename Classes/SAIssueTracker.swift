@@ -18,7 +18,7 @@ protocol IssueTracker
     var consoleLogsFilePath: String? { get set }
     var exceptionLogsFilePath: String? { get set }
     
-    func send()
+    func send(completion: @escaping( _ completion: Bool, _ error: Error?) -> Void)
 }
 
 // MARK: SAIssueTracker
@@ -54,9 +54,23 @@ class SAIssueTracker : IssueTracker
            return
         }
         
+        weak var weakSelf = self
         if needToSendLogFiles()
         {
-            send()
+            let strongSelf = weakSelf
+            send(completion:
+            { (completed, error) in
+                
+                if (completed)
+                {
+                    /**
+                     clear files so that same files don't get send again
+                     **/
+                    strongSelf?.clearFile(path: (strongSelf?.consoleLogsFilePath!)!)
+                    strongSelf?.clearFile(path: (strongSelf?
+                        .exceptionLogsFilePath!)!)
+                }
+            })
         }
         
         if optedForConsoleLogs
@@ -81,9 +95,12 @@ class SAIssueTracker : IssueTracker
         return exceptionLogs
     }
     
-    func send()
+    func send(completion: @escaping (Bool, Error?) -> Void)
     {
-        self.issueSender.sendLogs!()
+        self.issueSender.sendLogs
+        { (completed, error) in
+            completion(completed,error)
+        }
     }
 }
 
@@ -167,6 +184,19 @@ private extension SAIssueTracker
         catch
         {
             return true //empty
+        }
+    }
+    
+    func clearFile(path: String)
+    {
+        let text = ""
+        do
+        {
+            try text.write(toFile: path, atomically: false, encoding: String.Encoding.utf8)
+        }
+        catch
+        {
+            //
         }
     }
     
