@@ -12,27 +12,33 @@ import UIKit
 
 protocol IssueTracker
 {
+    var issueSender: IssueSender { get set }
     var optedForConsoleLogs : Bool { get }
     var optedForExceptionLogs : Bool { get }
+    var consoleLogsFilePath: String? { get set }
+    var exceptionLogsFilePath: String? { get set }
     
-    func sendConsoleLogs()
-    func sendUnCaughtExceptions()
+    func send()
 }
 
 // MARK: SAIssueTracker
 
 class SAIssueTracker : IssueTracker
 {
-    private var email: String
+    var consoleLogsFilePath: String?
+    var exceptionLogsFilePath: String?
+
+    var issueSender: IssueSender
+
     private var consoleLogs: Bool
     private var exceptionLogs: Bool
     
     fileprivate var _consoleLogFilePointer: UnsafeMutablePointer<FILE>?
     fileprivate var _exceptionsLogFilePointer: UnsafeMutablePointer<FILE>?
     
-    public init(email: String, consoleLogs: Bool , exceptionLogs: Bool)
+    public init(issueSender: IssueSender, consoleLogs: Bool , exceptionLogs: Bool)
     {
-        self.email = email
+        self.issueSender = issueSender
         self.consoleLogs = consoleLogs
         self.exceptionLogs = exceptionLogs
         
@@ -44,11 +50,13 @@ class SAIssueTracker : IssueTracker
         
         if optedForConsoleLogs
         {
-            saveConsoleLogsInFile()
+            consoleLogsFilePath = saveConsoleLogsInFile()
+            self.issueSender.consoleLogsFilePath = consoleLogsFilePath
         }
         if optedForExceptionLogs
         {
-            saveExceptionLogsInFile()
+            exceptionLogsFilePath = saveExceptionLogsInFile()
+            self.issueSender.exceptionLogsFilePath = exceptionLogsFilePath
             configureUnCaughtExceptionLogs()
         }
         closeLogFilesOnAppTermination()
@@ -64,14 +72,9 @@ class SAIssueTracker : IssueTracker
         return exceptionLogs
     }
     
-    func sendUnCaughtExceptions()
+    func send()
     {
-        
-    }
-
-    func sendConsoleLogs()
-    {
-        
+        self.issueSender.sendLogs!()
     }
 }
 
@@ -85,18 +88,20 @@ private extension SAIssueTracker
         static let exceptionsLogFileName = "exceptions.log"
     }
     
-    func saveConsoleLogsInFile()
+    func saveConsoleLogsInFile() -> String
     {
         let pathForLog = documentDirectoryPathAppending(path: SAIssueTracker.consoleLogFileName)
         _consoleLogFilePointer = freopen(pathForLog.cString(using: String.Encoding.ascii)!, "w", stdout)
         setvbuf(_consoleLogFilePointer, nil, _IONBF, 0)
+        return pathForLog
     }
     
-    func saveExceptionLogsInFile()
+    func saveExceptionLogsInFile() -> String
     {
         let pathForLog = documentDirectoryPathAppending(path: SAIssueTracker.exceptionsLogFileName)
         _exceptionsLogFilePointer = freopen(pathForLog.cString(using: String.Encoding.ascii)!, "w", stderr)
          setvbuf(_exceptionsLogFilePointer, nil, _IONBF, 0)
+        return pathForLog
     }
     
     func configureUnCaughtExceptionLogs()
@@ -140,14 +145,6 @@ private extension SAIssueTracker
         let fullPath = documentsDirectory.appending("/\(path)")
         return fullPath;
     }
-    
-    func isValid(email: String?) -> Bool
-    {
-        let emailRegEx = "(?:[a-z0-9!#$%\\&'*+/=?\\^_`{|}~-]+(?:\\.[a-z0-9!#$%\\&'*+/=?\\^_`{|}"+"~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\"+"x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-"+"z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5"+"]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-"+"9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21"+"-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
-        
-        let emailTest = NSPredicate(format:"SELF MATCHES[c] %@", emailRegEx)
-        return emailTest.evaluate(with: email)
-    }
 }
 
 //MARK: Global functions
@@ -155,7 +152,7 @@ private extension SAIssueTracker
 func exceptionHandler(exception : NSException)
 {
     fputs("Stack Trace:\n \(exception.callStackSymbols.joined(separator: "\n"))", __stderrp)
-    
+
     //reset so that duplicate Stack Trace from Signals doesn't get print up
     resetDefaultHandlingForUncaughtExceptions()
 }

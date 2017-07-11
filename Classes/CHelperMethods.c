@@ -9,7 +9,7 @@
 
 // https://stackoverflow.com/a/4746378/3632958
 
-#include <stdbool.h>
+#include "CHelperMethods.h"
 #include <assert.h>
 #include <sys/types.h>
 #include <unistd.h>
