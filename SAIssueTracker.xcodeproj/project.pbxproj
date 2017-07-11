@@ -131,8 +131,8 @@
 			isa = PBXGroup;
 			children = (
 				C1C476EF1F111DBC0005A412 /* SAIssueTracker.swift */,
-				C19075DD1F13CA8300AEADD1 /* IssueSender.swift */,
 				C19075DF1F13CB1100AEADD1 /* IssueMailer.swift */,
+				C19075DD1F13CA8300AEADD1 /* IssueSender.swift */,
 				C198C0151F14B712007FBCA5 /* CHelperMethods.h */,
 				C18FB3541F139F84007680AE /* CHelperMethods.c */,
 				C18FB3531F139F83007680AE /* SAIssueTracker-Bridging-Header.h */,

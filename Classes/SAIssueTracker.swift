@@ -15,8 +15,6 @@ protocol IssueTracker
     var issueSender: IssueSender { get set }
     var optedForConsoleLogs : Bool { get }
     var optedForExceptionLogs : Bool { get }
-    var consoleLogsFilePath: String? { get set }
-    var exceptionLogsFilePath: String? { get set }
     
     func send(completion: @escaping( _ completion: Bool, _ error: Error?) -> Void)
 }
@@ -25,8 +23,8 @@ protocol IssueTracker
 
 class SAIssueTracker : IssueTracker
 {
-    var consoleLogsFilePath: String?
-    var exceptionLogsFilePath: String?
+    private var consoleLogsFilePath: String?
+    private var exceptionLogsFilePath: String?
 
     var issueSender: IssueSender
 
