@@ -59,17 +59,17 @@ extension IssueMailer: IssueSender
         builder.header.from = MCOAddress(mailbox: self.senderEmail)
         builder.header.subject = self.subject ?? "SA Issue Tracker"
         
-        let attachment1 = MCOAttachment(contentsOfFile: consoleLogsFilePath)
-        let attachment2 = MCOAttachment(contentsOfFile: exceptionLogsFilePath)
         
-        if (attachment1?.data != nil)
+        if (consoleLogsFilePath != nil && FileManager.checkIfFileIsEmpty(path: consoleLogsFilePath!) == false)
         {
-           builder.addAttachment(attachment1)
+           let attachment = MCOAttachment(contentsOfFile: consoleLogsFilePath)
+           builder.addAttachment(attachment)
         }
         
-        if (attachment2?.data != nil)
+        if (exceptionLogsFilePath != nil && FileManager.checkIfFileIsEmpty(path: exceptionLogsFilePath!) == false)
         {
-           builder.addAttachment(attachment2)
+            let attachment = MCOAttachment(contentsOfFile: exceptionLogsFilePath)
+            builder.addAttachment(attachment)
         }
         
         let rfc822Data = builder.data()

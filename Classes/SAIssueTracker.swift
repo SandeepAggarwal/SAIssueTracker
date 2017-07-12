@@ -10,13 +10,37 @@ import Foundation
 import UIKit
 
 
+extension FileManager
+{
+    static func checkIfFileIsEmpty(path: String) -> Bool
+    {
+        let manager = FileManager.default
+        guard manager.fileExists(atPath: path) else
+        {
+            return true //empty
+        }
+        
+        do
+        {
+            let attributes = try manager.attributesOfItem(atPath: path)
+            let size: UInt64 = attributes[FileAttributeKey.size] as! UInt64
+            
+            return (size == 0) //empty
+        }
+        catch
+        {
+            return true //empty
+        }
+    }
+}
+
 protocol IssueTracker
 {
     var issueSender: IssueSender { get set }
     var optedForConsoleLogs : Bool { get }
     var optedForExceptionLogs : Bool { get }
     
-    func send(completion: @escaping( _ completion: Bool, _ error: Error?) -> Void)
+    func send(completion: (( _ completion: Bool, _ error: Error?) -> Void)? )
 }
 
 // MARK: SAIssueTracker
@@ -93,12 +117,38 @@ class SAIssueTracker : IssueTracker
         return exceptionLogs
     }
     
-    func send(completion: @escaping (Bool, Error?) -> Void)
+    func sendLogsOnTakingScreenShot()
     {
+        weak var weakSelf = self
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.UIApplicationUserDidTakeScreenshot, object: nil, queue: nil)
+        { (notification) in
+            
+            let strongSelf = weakSelf
+            strongSelf?.send(completion: nil)
+        }
+    }
+    
+    @objc func send(completion:  ((Bool, Error?) -> Void)?)
+    {
+        guard (checkIfConsoleFileIsEmpty() == false || checkIfExceptionFileIsEmpty() == false) else
+        {
+            return
+        }
+        
         self.issueSender.sendLogs
         { (completed, error) in
-            completion(completed,error)
+            
+            guard (completion != nil) else
+            {
+                return
+            }
+            completion!(completed,error)
         }
+    }
+    
+    deinit
+    {
+        NotificationCenter.default.removeObserver(self,name: nil, object: nil)
     }
 }
 
@@ -165,25 +215,14 @@ private extension SAIssueTracker
     
     func checkIfExceptionFileIsEmpty() -> Bool
     {
-        let manager = FileManager.default
-        let path = customExceptionLogsFilePath()
-        guard manager.fileExists(atPath: path) else
-        {
-            return true //empty
-        }
-        
-        do
-        {
-           let attributes = try manager.attributesOfItem(atPath: path)
-           let size: UInt64 = attributes[FileAttributeKey.size] as! UInt64
-            
-           return (size == 0) //empty
-        }
-        catch
-        {
-            return true //empty
-        }
+        return FileManager.checkIfFileIsEmpty(path: customExceptionLogsFilePath())
     }
+    
+    func checkIfConsoleFileIsEmpty() -> Bool
+    {
+        return FileManager.checkIfFileIsEmpty(path: customConsoleLogsFilePath())
+    }
+    
     
     func clearFile(path: String)
     {
@@ -221,6 +260,7 @@ private extension SAIssueTracker
 
 func exceptionHandler(exception : NSException)
 {
+    fputs("Exception:\n \(exception)", __stderrp)
     fputs("Stack Trace:\n \(exception.callStackSymbols.joined(separator: "\n"))", __stderrp)
 
     //reset so that duplicate Stack Trace from Signals doesn't get print up
