@@ -34,11 +34,25 @@ extension FileManager
     }
 }
 
+private extension UIWindow
+{
+    func capture() -> UIImage
+    {
+        UIGraphicsBeginImageContextWithOptions(self.frame.size, self.isOpaque, UIScreen.main.scale)
+        self.layer.render(in: UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return image!
+    }
+}
+
 protocol IssueTracker
 {
     var issueSender: IssueSender { get set }
     var optedForConsoleLogs : Bool { get }
     var optedForExceptionLogs : Bool { get }
+    var optedForScreenShot : Bool { get }
     
     func send(completion: (( _ completion: Bool, _ error: Error?) -> Void)? )
 }
@@ -54,21 +68,24 @@ class SAIssueTracker : IssueTracker
 
     private var consoleLogs: Bool
     private var exceptionLogs: Bool
+    private var needScreenShot: Bool
     
     fileprivate var _consoleLogFilePointer: UnsafeMutablePointer<FILE>?
     fileprivate var _exceptionsLogFilePointer: UnsafeMutablePointer<FILE>?
     
-    public init(issueSender: IssueSender, consoleLogs: Bool , exceptionLogs: Bool)
+    public init(issueSender: IssueSender, consoleLogs: Bool , exceptionLogs: Bool, screenShot: Bool)
     {
         self.issueSender = issueSender
         self.consoleLogs = consoleLogs
         self.exceptionLogs = exceptionLogs
+        self.needScreenShot = screenShot
         
         consoleLogsFilePath = customConsoleLogsFilePath()
         exceptionLogsFilePath = customExceptionLogsFilePath()
         
         self.issueSender.consoleLogsFilePath = consoleLogsFilePath
         self.issueSender.exceptionLogsFilePath = exceptionLogsFilePath
+        self.issueSender.screenShotFilePath = customScreenShotFilePath()
         
         if amIAttachedToDebugger()
         {
@@ -117,6 +134,11 @@ class SAIssueTracker : IssueTracker
         return exceptionLogs
     }
     
+    var optedForScreenShot: Bool
+    {
+        return needScreenShot
+    }
+    
     func sendLogsOnTakingScreenShot()
     {
         weak var weakSelf = self
@@ -130,11 +152,16 @@ class SAIssueTracker : IssueTracker
     
     @objc func send(completion:  ((Bool, Error?) -> Void)?)
     {
-        guard (checkIfConsoleFileIsEmpty() == false || checkIfExceptionFileIsEmpty() == false) else
+        guard ( checkIfConsoleFileHasData() == true || checkIfExceptionFileHasData() == true ||
+            (optedForScreenShot && checkIfScreenShotFileHasData()) == true ) else
         {
             return
         }
         
+        if optedForScreenShot
+        {
+            captureScreenShot()
+        }
         self.issueSender.sendLogs
         { (completed, error) in
             
@@ -160,6 +187,7 @@ private extension SAIssueTracker
     {
         static let consoleLogFileName = "console.log"
         static let exceptionsLogFileName = "exceptions.log"
+        static let screenShotFileName = "screenShot.png"
     }
     
     func saveConsoleLogsInFile(path: String)
@@ -210,19 +238,23 @@ private extension SAIssueTracker
     
     func needToSendLogFiles() -> Bool
     {
-        return !checkIfExceptionFileIsEmpty()
+        return checkIfExceptionFileHasData()
     }
     
-    func checkIfExceptionFileIsEmpty() -> Bool
+    func checkIfExceptionFileHasData() -> Bool
     {
-        return FileManager.checkIfFileIsEmpty(path: customExceptionLogsFilePath())
+        return !(FileManager.checkIfFileIsEmpty(path: customExceptionLogsFilePath()))
     }
     
-    func checkIfConsoleFileIsEmpty() -> Bool
+    func checkIfConsoleFileHasData() -> Bool
     {
-        return FileManager.checkIfFileIsEmpty(path: customConsoleLogsFilePath())
+        return !(FileManager.checkIfFileIsEmpty(path: customConsoleLogsFilePath()))
     }
     
+    func checkIfScreenShotFileHasData() -> Bool
+    {
+        return !(FileManager.checkIfFileIsEmpty(path: customScreenShotFilePath()))
+    }
     
     func clearFile(path: String)
     {
@@ -230,6 +262,21 @@ private extension SAIssueTracker
         do
         {
             try text.write(toFile: path, atomically: false, encoding: String.Encoding.utf8)
+        }
+        catch
+        {
+            //
+        }
+    }
+    
+    func captureScreenShot()
+    {
+        let window: UIWindow! = UIApplication.shared.keyWindow
+        let windowImage = window.capture()
+        
+        do
+        {
+            try UIImagePNGRepresentation(windowImage)?.write(to: URL(fileURLWithPath: self.customScreenShotFilePath()))
         }
         catch
         {
@@ -245,6 +292,11 @@ private extension SAIssueTracker
     func customExceptionLogsFilePath() -> String
     {
         return documentDirectoryPathAppending(path: SAIssueTracker.exceptionsLogFileName)
+    }
+    
+    func customScreenShotFilePath() -> String
+    {
+        return documentDirectoryPathAppending(path: SAIssueTracker.screenShotFileName)
     }
     
     func documentDirectoryPathAppending(path: String) -> String

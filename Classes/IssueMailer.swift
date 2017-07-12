@@ -18,6 +18,7 @@ class IssueMailer
     var relayHost: String?
     var consoleLogsFilePath: String?
     var exceptionLogsFilePath: String?
+    var screenShotFilePath: String?
     
     init(senderEmail: String, senderPassword: String, toEmail: String)
     {
@@ -71,6 +72,13 @@ extension IssueMailer: IssueSender
             let attachment = MCOAttachment(contentsOfFile: exceptionLogsFilePath)
             builder.addAttachment(attachment)
         }
+        
+        if (screenShotFilePath != nil && FileManager.checkIfFileIsEmpty(path: screenShotFilePath!) == false)
+        {
+            let attachment = MCOAttachment(contentsOfFile: screenShotFilePath)
+            builder.addAttachment(attachment)
+        }
+        
         
         let rfc822Data = builder.data()
         let sendOperation = smtpSession.sendOperation(with: rfc822Data!)

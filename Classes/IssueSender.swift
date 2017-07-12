@@ -12,6 +12,7 @@ protocol IssueSender
 {
     var consoleLogsFilePath: String? {get set}
     var exceptionLogsFilePath: String? {get set}
+    var screenShotFilePath: String? { get set }
     
     func sendLogs(completion: @escaping( _ completion: Bool, _ error: Error?) -> Void)
 }
