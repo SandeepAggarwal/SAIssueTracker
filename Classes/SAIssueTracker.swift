@@ -53,6 +53,7 @@ protocol IssueTracker
     var optedForConsoleLogs : Bool { get }
     var optedForExceptionLogs : Bool { get }
     var optedForScreenShot : Bool { get }
+    var sendLogsOnTakingScreenShot : Bool? { get set }
     
     func send(completion: (( _ completion: Bool, _ error: Error?) -> Void)? )
 }
@@ -124,6 +125,23 @@ class SAIssueTracker : IssueTracker
         closeLogFilesOnAppTermination()
     }
     
+    var sendLogsOnTakingScreenShot: Bool?
+    {
+        didSet
+        {
+            if (sendLogsOnTakingScreenShot == true)
+            {
+                weak var weakSelf = self
+                NotificationCenter.default.addObserver(forName: NSNotification.Name.UIApplicationUserDidTakeScreenshot, object: nil, queue: nil)
+                { (notification) in
+                    
+                    let strongSelf = weakSelf
+                    strongSelf?.send(completion: nil)
+                }
+            }
+        }
+    }
+    
     var optedForConsoleLogs: Bool
     {
         return consoleLogs
@@ -137,17 +155,6 @@ class SAIssueTracker : IssueTracker
     var optedForScreenShot: Bool
     {
         return needScreenShot
-    }
-    
-    func sendLogsOnTakingScreenShot()
-    {
-        weak var weakSelf = self
-        NotificationCenter.default.addObserver(forName: NSNotification.Name.UIApplicationUserDidTakeScreenshot, object: nil, queue: nil)
-        { (notification) in
-            
-            let strongSelf = weakSelf
-            strongSelf?.send(completion: nil)
-        }
     }
     
     @objc func send(completion:  ((Bool, Error?) -> Void)?)
