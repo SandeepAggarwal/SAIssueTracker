@@ -12,10 +12,13 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    var tracker: SAIssueTracker?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        tracker =  SAIssueTracker(issueSender: IssueMailer(senderEmail: "", senderPassword: "", toEmail: ""), consoleLogs: true, exceptionLogs: true, screenShot: false)
+        tracker?.sendLogsOnTakingScreenShot = true
         
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = ViewController()
