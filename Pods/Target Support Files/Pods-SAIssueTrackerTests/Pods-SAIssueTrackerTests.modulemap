@@ -1,6 +1,0 @@
-framework module Pods_SAIssueTrackerTests {
-  umbrella header "Pods-SAIssueTrackerTests-umbrella.h"
-
-  export *
-  module * { export * }
-}
